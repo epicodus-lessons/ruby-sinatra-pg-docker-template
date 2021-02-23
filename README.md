@@ -4,6 +4,7 @@ This repository provides the necessary Docker configuration to use Sinatra and P
 
 * Run a Postgres server (which your Sinatra server can access)
 * Run psql to access and manage databases
+* Back up and restore a Postgres database
 
 This is a template repository, which means you should create a new repository using `ruby-sinatra-pg-docker-template` as a template. Once you've done so, clone the repository on your desktop and `cd` into the repository via the command line.
 
@@ -74,6 +75,28 @@ $ docker attach [CONTAINER_ID]
 ```
 
 Then, when your application hits a `binding.pry`, you will have an interactive terminal in the terminal where you attached to the Sinatra container.
+
+### Backing Up and Restoring a Database
+
+You will need to back up a database for your independent project. You also might want to back up and restore a database for multi-day projects as well. To back up or restore the database, the Postgres server must be running (either with `$ docker-compose up --build` or `$ docker-compose run db`). Use `$ docker ps` to get the container ID. You will likely not use the following commands enough for it to be worth aliasing them.
+
+#### Backing Up a Database
+
+To back up the database in a file called `database_backup.sql` in the root directory of the project, run the following command. Make sure to change `[CONTAINER_ID]` to the appropriate container ID and `[DATABASE_NAME]` to the name of the database you are backing up.
+
+```
+docker exec -i [CONTAINER_ID] pg_dump --username postgres [DATABASE_NAME] > database_backup.sql
+```
+
+#### Restoring a Database
+
+If you want to restore a database, you'll first need to create a database to dump data into. You can do this by using the `CREATE DATABASE` command in psql. Then, assuming you have a database backup named `database_backup.sql` in the root directory of your project, you can restore it with this command:
+
+```
+docker exec -i [CONTAINER_ID] psql --username postgres [DATABASE_NAME] < database_backup.sql
+```
+
+Make sure to replace `[CONTAINER_ID ]` with the container ID and the `[DATABASE_NAME]` with the name of the database you want to dump data into. For instance, if you just created a new database called `record_store` and you wanted to dump data into it, `[DATABASE_NAME]` would be replaced with record store.
 
 ### `tmp` Directory
 
